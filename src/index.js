@@ -6,6 +6,12 @@ import '../node_modules/font-awesome/css/font-awesome.min.css';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import { BASE_URL } from './constants/constants';
+import axios from 'axios';
+
+/**Axios Config */
+axios.defaults.baseURL = BASE_URL;
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

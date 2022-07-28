@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Skeleton from "react-loading-skeleton";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
+import Loading from "./shared/Loading";
 
 export default function Home() {
-  const [data, setData] = useState([]);
-  const [filter, setFilter] = useState(data);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filter, setFilter] = useState(products);
   const [loading, setLoading] = useState(false);
   const [empty, setEmpty] = useState(false);
 
@@ -13,42 +15,34 @@ export default function Home() {
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
-      const response = await fetch("https://fakestoreapi.com/products");
+      const catResponse = await axios.get("/categories");
+      const response = await axios.get("/products/");
       if (componentMounted) {
-        setData(await response.clone().json());
-        setFilter(await response.json());
+        setCategories(catResponse.data);
+        setProducts(response.data);
+        setFilter(response.data);
         setLoading(false);
       }
     };
     getProducts();
   }, []);
 
-  const Loading = () => {
+  const Empty = () => {
     return (
       <>
-        <div class="d-flex justify-content-center">
-          <div
-            class="spinner-border"
-            style={{ width: 75, height: 75 }}
-            role="status"
-          >
-            <span class="sr-only">Loading...</span>
-          </div>
+        <div className="card text-center m-5 p-5">
+          <h1 className="card-title p-3"> No any products in this Category</h1>
         </div>
       </>
     );
   };
 
-  const Empty = () => {
-    return (
-      <>
-        <p>No products in this category</p>
-      </>
-    );
-  };
-
   const filterProducts = (cat) => {
-    const updatedList = data.filter((x) => x.category === cat);
+    if(cat === null){
+      setFilter(products);
+      setEmpty(false);
+    }else{
+    const updatedList = products.filter((x) => x.categoryId === cat);
     if (updatedList.length > 0) {
       setEmpty(false);
       setFilter(updatedList);
@@ -56,77 +50,57 @@ export default function Home() {
       setFilter(updatedList);
       setEmpty(true);
     }
+  }
+  };
+
+
+  const ShowCategories = () => {
+    return (
+      <div className="buttons d-flex justify-content-center mb-2 pb-2">
+        <button className="btn btn-outline-dark me-2" onClick={() => filterProducts(null)}>All</button>
+        {categories.map((category) => {
+          return (
+            <div key={category.categoryId}>
+              <button className="btn btn-outline-dark me-2 " onClick={() => filterProducts(category.categoryId)}>
+                {category.categoryName}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   const ShowProducts = () => {
-    return (
-      <>
-        <div className="buttons d-flex justify-content-center mb-2 pb-2">
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => setFilter(data)}
-          >
-            All
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProducts("men's clothing")}
-          >
-            Meats
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProducts("womens's clothing")}
-          >
-            Vegetables
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProducts("jewelery")}
-          >
-            Dry Food
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProducts("electronics")}
-          >
-            Cooked
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProducts(data)}
-          >
-            Chips
-          </button>
-        </div>
-        {filter.map((product) => {
-          return (
-            <>
-              <div className="col-md-3 mb-3">
-                <div class="card  h-80 text-center p-3">
-                  <img
-                    src={product.image}
-                    class="card-img-top"
-                    alt={product.title}
-                    height="250px"
-                  />
-                  <div class="card-body">
-                    <h5 class="card-title mb-0">
-                      {product.title.substring(0, 15)}
-                    </h5>
-                    <p class="card-text">${product.price}</p>
-                    <div>
-                      <NavLink to={`/products/${product.id}`}>
-                        <span class="btn btn-outline-dark">Buy</span>
-                      </NavLink>
-                    </div>
+    return(
+      filter.map((product) => {
+        let image = "/products/"+product.imageUrl
+
+        return (
+            <div key={product.productId} className="col-md-3 mb-3">
+              <div className="card  h-80 text-center p-3">
+                <img
+                  src={image}
+                  className="card-img-top"
+                  alt={product.productName}
+                  height="250px"
+                />
+                <div className="card-body">
+                  <h5 className="card-title mb-0">
+                    {product.productName.substring(0, 15)}
+                  </h5>
+                  <p className="card-text">${product.unitPrice}</p>
+                  <div>
+                    <NavLink to={`/products/${product.productId}`}>
+                      <span className="btn btn-outline-dark">Buy</span>
+                    </NavLink>
                   </div>
                 </div>
               </div>
-            </>
-          );
-        })}
-      </>
+            </div>
+        );
+
+      })
     );
   };
 
@@ -138,6 +112,7 @@ export default function Home() {
             <h1 className="display-6 fw-bolder text-center">Products</h1>
             <hr />
           </div>
+          <ShowCategories />
           <div className="row justify-content-center">
             {loading ? <Loading /> : <ShowProducts />}
             {empty ? <Empty /> : null}
