@@ -13,9 +13,9 @@ export default function Navbar() {
     <div>
       <nav className="navbar navbar-expand-lg bg-light py-2 shadow-sm">
         <div className="container">
-          <a className="navbar-brand fw-bold fs-4" href="#">
+          <NavLink className="navbar-brand fw-bold fs-4 text-black" to="#">
             FoodieBuy
-          </a>
+          </NavLink>
           <button
             className="navbar-toggler"
             type="button"
@@ -30,19 +30,19 @@ export default function Navbar() {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav mx-auto mb-2 mb-lg-0 ">
               <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">
+                <NavLink className="nav-link active text-black text-opacity-75" aria-current="page" to="/">
                   Home
-                </a>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">
+                <NavLink className="nav-link text-black text-opacity-75" to="/about">
                   About
-                </a>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">
+                <NavLink className="nav-link text-black text-opacity-75" to="/contact">
                   Contact
-                </a>
+                </NavLink>
               </li>
             </ul>
             <div className="buttons">
