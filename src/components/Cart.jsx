@@ -57,7 +57,7 @@ export default function Cart() {
                     <p className="card-text">Price Per Unit</p>
                   </div>
                   <div className="col-md-6 text-center">
-                    <p className="card-text">{currentProduct.unitPrice}$</p>
+                    <p className="card-text">LKR. {currentProduct.unitPrice}</p>
                   </div>
                 </div>
 
@@ -66,7 +66,7 @@ export default function Cart() {
                     <h5 className="card-text">Total</h5>
                   </div>
                   <div className="col-md-6 text-center">
-                    <h5 className="card-text">{currentProduct.unitPrice*currentProduct.qty}$</h5>
+                    <h5 className="card-text">LKR. {currentProduct.unitPrice*currentProduct.qty}</h5>
                   </div>
                 </div>
               </div>

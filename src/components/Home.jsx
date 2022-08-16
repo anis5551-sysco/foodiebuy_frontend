@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import Loading from "./shared/Loading";
+import AddProduct from "./AddProduct";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -9,14 +10,32 @@ export default function Home() {
   const [filter, setFilter] = useState(products);
   const [loading, setLoading] = useState(false);
   const [empty, setEmpty] = useState(false);
+  const [addProduct, setAddProduct] = useState(true);
 
   let componentMounted = true;
 
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
-      const catResponse = await axios.get("/categories");
-      const response = await axios.get("/products/");
+      // const login = await axios.post('/login', {
+      //   params: {
+      //     username: 'ahamed@mailnesia.com',
+      //     password: '12345'
+      //   }
+      // });
+      // console.log(login.data);
+      const catResponse = await axios({
+        method: "get",
+        url: "/categories",
+        headers: {
+        },
+      });
+      const response = await axios({
+        method: "get",
+        url: "/products/",
+        headers: {
+        },
+      });
       if (componentMounted) {
         setCategories(catResponse.data);
         setProducts(response.data);
@@ -38,30 +57,43 @@ export default function Home() {
   };
 
   const filterProducts = (cat) => {
-    if(cat === null){
+    if (cat === null) {
       setFilter(products);
       setEmpty(false);
-    }else{
-    const updatedList = products.filter((x) => x.categoryId === cat);
-    if (updatedList.length > 0) {
-      setEmpty(false);
-      setFilter(updatedList);
     } else {
-      setFilter(updatedList);
-      setEmpty(true);
+      const updatedList = products.filter((x) => x.categoryId === cat);
+      if (updatedList.length > 0) {
+        setEmpty(false);
+        setFilter(updatedList);
+      } else {
+        setFilter(updatedList);
+        setEmpty(true);
+      }
     }
-  }
   };
 
+  // const ShowAddProduct =() =>{
+  //   return(
+
+  //   )
+  // }
 
   const ShowCategories = () => {
     return (
       <div className="buttons d-flex justify-content-center mb-2 pb-2">
-        <button className="btn btn-outline-dark me-2" onClick={() => filterProducts(null)}>All</button>
+        <button
+          className="btn btn-outline-dark me-2"
+          onClick={() => filterProducts(null)}
+        >
+          All
+        </button>
         {categories.map((category) => {
           return (
             <div key={category.categoryId}>
-              <button className="btn btn-outline-dark me-2 " onClick={() => filterProducts(category.categoryId)}>
+              <button
+                className="btn btn-outline-dark me-2 "
+                onClick={() => filterProducts(category.categoryId)}
+              >
                 {category.categoryName}
               </button>
             </div>
@@ -72,36 +104,33 @@ export default function Home() {
   };
 
   const ShowProducts = () => {
-    return(
-      filter.map((product) => {
-        let image = "/products/"+product.imageUrl
+    return filter.map((product) => {
+      let image = "/products/" + product.imageUrl;
 
-        return (
-            <div key={product.productId} className="col-md-3 mb-3">
-              <div className="card  h-80 text-center p-3">
-                <img
-                  src={image}
-                  className="card-img-top"
-                  alt={product.productName}
-                  height="250px"
-                />
-                <div className="card-body">
-                  <h5 className="card-title mb-0">
-                    {product.productName.substring(0, 15)}
-                  </h5>
-                  <p className="card-text">${product.unitPrice}</p>
-                  <div>
-                    <NavLink to={`/products/${product.productId}`}>
-                      <span className="btn btn-outline-dark">Buy</span>
-                    </NavLink>
-                  </div>
-                </div>
+      return (
+        <div key={product.productId} className="col-md-3 mb-3">
+          <div className="card  h-80 text-center p-3">
+            <img
+              src={image}
+              className="card-img-top"
+              alt={product.productName}
+              height="250px"
+            />
+            <div className="card-body">
+              <h5 className="card-title mb-0">
+                {product.productName.substring(0, 15)}
+              </h5>
+              <p className="card-text">LKR. {product.unitPrice}</p>
+              <div>
+                <NavLink to={`/products/${product.productId}`}>
+                  <span className="btn btn-outline-dark">Buy</span>
+                </NavLink>
               </div>
             </div>
-        );
-
-      })
-    );
+          </div>
+        </div>
+      );
+    });
   };
 
   return (
@@ -110,8 +139,8 @@ export default function Home() {
         <div className="row">
           <div className="col-12 mb-5">
             <h1 className="display-6 fw-bolder text-center">Products</h1>
-            <hr />
           </div>
+            
           <ShowCategories />
           <div className="row justify-content-center">
             {loading ? <Loading /> : <ShowProducts />}

@@ -1,7 +1,46 @@
-import React from "react";
+import React, {useState} from "react";
+import axios from "axios";
 import LoginPage from '../assets/images/loginPage.jpg'
+import qs from 'qs';
+import { useDispatch, useSelector} from 'react-redux'
+import { loginStart } from "../redux/action";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState([]);
+  
+  const dispatch = useDispatch();
+  const tryLogin = (tokens, email) => {
+    dispatch(loginStart(tokens, email));
+  }
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleSubmit = async () => {
+      try {
+        const data = { 'email':email, 'password':password};
+        const response = await axios({
+          method: "post",
+          url: "/login",
+          data: qs.stringify(data),
+          headers: {
+          },
+        });
+        
+        const tokens = response.data;
+        // const currentEmail = email
+        tryLogin(tokens, email);
+      } catch (error) {
+        console.log(error);
+      }
+  };
   return (
     <div>
           <div className="row d-flex justify-content-center align-items-center py-5">
@@ -29,10 +68,13 @@ export default function Login() {
                         <div className="form-outline mb-4">
                           <input
                             type="email"
-                            id="form2Example17"
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={handleEmailChange}
                             className="form-control form-control-lg"
                           />
-                          <label className="form-label" for="form2Example17">
+                          <label className="form-label" htmlFor="email">
                             Email address
                           </label>
                         </div>
@@ -40,10 +82,13 @@ export default function Login() {
                         <div className="form-outline mb-4">
                           <input
                             type="password"
-                            id="form2Example27"
+                            id="passsword"
+                            name="passsword"
+                            value={password}
+                            onChange={handlePasswordChange}
                             className="form-control form-control-lg"
                           />
-                          <label className="form-label" for="form2Example27">
+                          <label className="form-label" htmlFor="password">
                             Password
                           </label>
                         </div>
@@ -52,6 +97,7 @@ export default function Login() {
                           <button
                             className="btn btn-dark btn-lg btn-block"
                             type="button"
+                            onClick={handleSubmit}
                           >
                             Login
                           </button>
